@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-waygame",
-  "description": "对接 WayGame 文字游戏核心：在群里打字就能玩 RPG（被动消息 + 主动推送 + 端口自动发现）",
+  "description": "大型文字游戏框架，支持TXT，Markdown，图片绘制三种消息回复模式，注册打怪，结婚交友，地图闲逛等等",
   "version": "1.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -44,8 +44,8 @@
   },
   "koishi": {
     "description": {
-      "zh": "把 Koishi 机器人接到 WayGame 文字游戏核心：玩家在群里打字即可游戏，支持文本 / Markdown / 图片回复与主动推送。",
-      "en": "Bridge Koishi bots to the WayGame text-game core."
+      "zh": "大型文字游戏框架，支持TXT，Markdown，图片绘制三种消息回复模式，注册打怪，结婚交友，地图闲逛等等",
+      "en": "A full-featured text-game framework with TXT / Markdown / image rendering: register, fight monsters, marry, explore maps and more."
     }
   }
 }
