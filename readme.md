@@ -117,6 +117,12 @@ npx tsx test/probe.ts "注册 张三 男"
 > 对**真核心**的联调脚本（自动搭沙盒、随机端口、跑完还原机器级文件）留在开发工作区里，
 > 因为它要读写本机 WayGame 仓库和 `%LOCALAPPDATA%`，不适合放进公开仓库。
 
+## 交流群
+
+**QQ 群：1121395453** —— 装包、报错、提需求都可以在群里问。
+
+问题也可以提到 [GitHub Issues](https://github.com/Juenia/KoishiPlugin-WayGame/issues)。
+
 ## AI 开发声明
 
 **本插件由 AI 编程助手在人类指令下开发。**
