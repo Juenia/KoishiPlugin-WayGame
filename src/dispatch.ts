@@ -9,6 +9,24 @@ export type Sendable = string | Element | Element[]
 /** 统一的发送口：群里用 Session，主动推送用 bot.sendMessage */
 export type Sender = (content: Sendable) => Promise<unknown>
 
+/**
+ * 各平台的原生 Markdown 元素名。
+ *
+ * 背景：Satori 的元素库里**没有** markdown（只有 text/at/quote/image…），
+ * markdown 是适配器自己注册的命名空间元素 ——
+ * QQ 官方适配器在 \`@satorijs/adapter-qq/src/message.ts\` 里处理 \`qq:markdown\`：
+ * 遇到它就把 msg_type 设成 MARKDOWN，并把里面的文本原样保留（不再转义）。
+ * 所以想让 QQ 真的显示 Markdown，必须发这个元素，光发字符串永远只是纯文本。
+ */
+const MARKDOWN_ELEMENTS: Record<string, string> = {
+  qq: 'qq:markdown',
+}
+
+/** 这个平台有没有原生 Markdown 元素；没有就返回 undefined，由调用方退回纯文本 */
+export function markdownElementFor(platform: string): string | undefined {
+  return MARKDOWN_ELEMENTS[String(platform || '').toLowerCase()]
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }
@@ -166,6 +184,7 @@ export async function deliverResponse(
   response: BeeMessageResponse,
   config: Config,
   logger: Logger,
+  markdownElement?: string,
 ): Promise<boolean> {
   const type = String((response && response.type) || 'text').toLowerCase()
   const content = String((response && response.content) == null ? '' : response.content)
@@ -180,7 +199,48 @@ export async function deliverResponse(
     return true
   }
 
-  const text = type === 'markdown' && config.text.markdownMode === 'strip' ? stripMarkdown(content) : content
-  if (!text.trim()) return false
-  return sendText(send, text, config)
+  if (type === 'markdown') return sendMarkdown(send, content, config, logger, markdownElement)
+
+  if (!content.trim()) return false
+  return sendText(send, content, config)
+}
+
+/**
+ * markdown 回复的三种走法（配置 text.markdownMode）：
+ *   auto （默认）平台有原生 Markdown 元素就发元素，没有/发失败就退回源码文本
+ *   text        永远发源码文本
+ *   strip       永远发去掉记号的纯文本
+ *
+ * 注意 auto 一定要带发送失败回退：不同适配器对未知元素的处理不一样，
+ * 万一某个平台既不认识这个元素又直接抛错，玩家就什么都收不到了。
+ */
+export async function sendMarkdown(
+  send: Sender,
+  content: string,
+  config: Config,
+  logger: Logger,
+  markdownElement?: string,
+): Promise<boolean> {
+  const source = String(content || '')
+  const mode = config.text.markdownMode
+
+  if (mode === 'strip') {
+    const plain = stripMarkdown(source)
+    if (!plain.trim()) return false
+    return sendText(send, plain, config)
+  }
+
+  if (mode === 'auto' && markdownElement) {
+    try {
+      // 元素里的文本由适配器原样保留，Markdown 记号不会被吃掉
+      await send(h(markdownElement as any, {}, source))
+      logger.debug('已按原生 Markdown 发送（%s）', markdownElement)
+      return true
+    } catch (error) {
+      logger.warn('原生 Markdown（%s）发送失败，退回纯文本：%s', markdownElement, describeError(error))
+    }
+  }
+
+  if (!source.trim()) return false
+  return sendText(send, source, config)
 }

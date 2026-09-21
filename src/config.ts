@@ -33,7 +33,7 @@ export interface Config {
   text: {
     maxLength: number
     chunkDelay: number
-    markdownMode: 'text' | 'strip'
+    markdownMode: 'auto' | 'text' | 'strip'
     quoteReply: boolean
   }
   image: {
@@ -87,9 +87,10 @@ export const Config: Schema<Config> = Schema.intersect([
       maxLength: Schema.number().default(2000).min(0).max(20000).description('单条文本最大长度，超出按换行切分（0 = 不切分）'),
       chunkDelay: Schema.number().default(500).min(0).max(10000).description('切分后每条之间的间隔（毫秒）'),
       markdownMode: Schema.union([
-        Schema.const('text').description('原样发送 Markdown 源码'),
-        Schema.const('strip').description('去掉 Markdown 记号后发送纯文本（QQ 普通群消息更整洁）'),
-      ]).default('text').description('markdown 类型回复的处理方式'),
+        Schema.const('auto').description('平台支持就发原生 Markdown（QQ 官方机器人走 qq:markdown），不支持时自动退回源码文本'),
+        Schema.const('text').description('永远原样发送 Markdown 源码'),
+        Schema.const('strip').description('永远去掉 Markdown 记号后发纯文本'),
+      ]).default('auto').description('markdown 类型回复的处理方式'),
       quoteReply: Schema.boolean().default(false).description('回复时引用玩家原消息'),
     }).description('文本回复'),
 

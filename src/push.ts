@@ -1,7 +1,7 @@
 import type { Bot, Context, Logger } from 'koishi'
 import type { Config } from './config'
 import { CoreOfflineError, type BeeMessageResponse, type PushItem, type WayGameClient } from './core-client'
-import { deliverResponse, describeError, type Sender } from './dispatch'
+import { deliverResponse, describeError, markdownElementFor, type Sender } from './dispatch'
 
 /**
  * 主动推送（服务端 → 插件）：契约 §7.2.1 的拉取模式。
@@ -121,7 +121,7 @@ async function deliverPushItem(
       ? bot.sendPrivateMessage(target, content as any)
       : bot.sendMessage(target, content as any)
     try {
-      const delivered = await deliverResponse(send, payload, config, logger)
+      const delivered = await deliverResponse(send, payload, config, logger, markdownElementFor(bot.platform))
       if (!delivered) {
         lastError = '推送内容为空'
         continue

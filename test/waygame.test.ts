@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as waygame from '../src/index'
 import { discoverEndpoint } from '../src/core-client'
+import { deliverResponse, markdownElementFor } from '../src/dispatch'
 import { MockCore } from './mock-core'
 
 /**
@@ -130,6 +131,35 @@ function toText(content: any): string {
 function firstImage(content: any): any {
   const list = Array.isArray(content) ? content : [content]
   return list.find((element: any) => element && (element.type === 'img' || element.type === 'image'))
+}
+
+/* --------------------------------------------------- 发送层单测的小工具 */
+
+const MD = '**加粗标题**\n> 引用一行'
+
+/** 取默认配置（schemastery 实例可以直接当函数调用，顺带把默认值补齐） */
+function defaults(overrides: Record<string, any> = {}): any {
+  return (waygame.Config as any)(overrides)
+}
+
+/** 记录"发出去的东西"的假发送口 */
+function makeSink(): { got: any[]; send: (content: any) => Promise<unknown[]> } {
+  const got: any[] = []
+  return { got, send: async (content: any) => { got.push(content); return [] } }
+}
+
+const silentLogger: any = { debug() {}, info() {}, warn() {}, error() {}, success() {} }
+
+/** 递归取出元素树里的纯文本（qq:markdown 会把源码放在子节点里） */
+function deepText(content: any): string {
+  if (content == null) return ''
+  if (typeof content === 'string') return content
+  const list = Array.isArray(content) ? content : [content]
+  return list.map((element: any) => {
+    if (typeof element === 'string') return element
+    if (element.type === 'text') return String((element.attrs && element.attrs.content) || '')
+    return deepText(element.children)
+  }).join('')
 }
 
 async function main(): Promise<void> {
@@ -357,6 +387,58 @@ async function main(): Promise<void> {
     assert.ok(text.includes(core.url), '应带上核心地址，实际：' + text)
     assert.ok(text.includes('核心状态：在线'), '应报在线，实际：' + text)
     assert.ok(text.includes('推送队列'), '应报队列，实际：' + text)
+  })
+
+  // ---------------------------------------------------------------- markdown 发送
+  section('markdown 回复：原生元素 vs 纯文本')
+
+  await test('平台映射：只有 qq 有原生 markdown 元素', async () => {
+    assert.equal(markdownElementFor('qq'), 'qq:markdown')
+    assert.equal(markdownElementFor('QQ'), 'qq:markdown')
+    assert.equal(markdownElementFor('onebot'), undefined)
+    assert.equal(markdownElementFor(''), undefined)
+  })
+
+  await test('auto + QQ：发的是 qq:markdown 元素，源码原样保留', async () => {
+    const sink = makeSink()
+    await deliverResponse(sink.send, { type: 'markdown', content: MD }, defaults(), silentLogger, markdownElementFor('qq'))
+    assert.equal(sink.got.length, 1, '应该只发一条')
+    const element: any = sink.got[0]
+    assert.equal(typeof element, 'object', 'auto 模式下发的应该是元素而不是字符串：' + JSON.stringify(element))
+    assert.equal(element.type, 'qq:markdown', '实际类型：' + element.type)
+    assert.equal(deepText(element), MD, '源码必须原样进元素，记号不能被吃掉')
+  })
+
+  await test('auto + 不支持的平台：退回源码纯文本', async () => {
+    const sink = makeSink()
+    await deliverResponse(sink.send, { type: 'markdown', content: MD }, defaults(), silentLogger, markdownElementFor('onebot'))
+    assert.equal(sink.got.length, 1)
+    assert.equal(sink.got[0], MD)
+  })
+
+  await test('mode=text：平台支持也发纯文本源码', async () => {
+    const sink = makeSink()
+    await deliverResponse(sink.send, { type: 'markdown', content: MD }, defaults({ text: { markdownMode: 'text' } }), silentLogger, 'qq:markdown')
+    assert.equal(sink.got[0], MD)
+  })
+
+  await test('mode=strip：去记号发纯文本', async () => {
+    const sink = makeSink()
+    await deliverResponse(sink.send, { type: 'markdown', content: MD }, defaults({ text: { markdownMode: 'strip' } }), silentLogger, 'qq:markdown')
+    assert.ok(!String(sink.got[0]).includes('**'), '不该留记号：' + sink.got[0])
+    assert.ok(String(sink.got[0]).includes('加粗标题'))
+  })
+
+  await test('原生元素发失败时退回纯文本（不能让玩家什么都收不到）', async () => {
+    const got: any[] = []
+    const send = async (content: any) => {
+      if (typeof content !== 'string') throw new Error('适配器不认识这个元素')
+      got.push(content)
+      return []
+    }
+    await deliverResponse(send, { type: 'markdown', content: MD }, defaults(), silentLogger, 'qq:markdown')
+    assert.equal(got.length, 1, '应该刚好有一条回退后的纯文本')
+    assert.equal(got[0], MD)
   })
 
   // ---------------------------------------------------------------- 主动推送

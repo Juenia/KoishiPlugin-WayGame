@@ -1,7 +1,7 @@
 import { Context, h, type Logger, type Session } from 'koishi'
 import { Config } from './config'
 import { CoreOfflineError, WayGameClient, type BeeMessageRequest, type BeeMessageResponse } from './core-client'
-import { deliverResponse, describeError, type Sendable, type Sender } from './dispatch'
+import { deliverResponse, describeError, markdownElementFor, type Sendable, type Sender } from './dispatch'
 import { startPushLoop } from './push'
 
 export { Config } from './config'
@@ -93,7 +93,11 @@ async function handleMessage(
   if (response.unknown && !allowUnknown(content, config)) return
   if (!content && type !== 'image') return
 
-  const delivered = await deliverResponse(buildSender(session, config), response, config, logger)
+  // 平台决定 markdown 怎么发：QQ 官方适配器有 qq:markdown 元素，其它平台退回纯文本
+  const platform = (session.bot && session.bot.platform) || session.platform || ''
+  const delivered = await deliverResponse(
+    buildSender(session, config), response, config, logger, markdownElementFor(platform),
+  )
   if (!delivered && config.debug) logger.debug('这条回复没有可发的内容')
 }
 

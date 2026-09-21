@@ -71,6 +71,7 @@ plugins:
 | `message.prefix` | 空 | 空 = 每条消息都交给核心判断；填了则只有带前缀的消息才进游戏 |
 | `message.unknownPolicy` | `silent` | 契约默认全静默；想让新玩家看到「请先注册」就改成 `unregistered` |
 | `image.mode` | `auto` | 图片下发方式，`auto` = 本地文件 → URL → base64 |
+| `text.markdownMode` | `auto` | `auto` = 平台支持就发**原生 Markdown**（QQ 官方机器人走 `qq:markdown`），否则退回源码文本；也可强制 `text`（源码）/ `strip`（去记号纯文本） |
 | `push.autoSwitchToPull` | 开 | 启动时把核心推送模式切成 `pull`，核心自带工人让路，避免一条推送被投两遍 |
 | `push.broadcastTarget` | 空 | 核心的 `broadcast` 类推送 `target_id` 是 null、插件无处可发；填上群号才会真的发出去 |
 | `push.retryOnFailure` | 关 | **不建议开**：只有确认没发出去才该让核心重发，否则群里会重复刷屏 |
@@ -92,6 +93,11 @@ plugins:
    本插件拉取时**不带 plugin 过滤**，因为 pull 模式下插件就是唯一的投递者。
 5. **图片降级要认 `type`。** 出图失败时核心会把 `type` 从 `image` 降回 `markdown`/`text` 并带 `imageError`，
    此时 `content` 是文本 —— **先看 type 再决定怎么发**。
+6. **Markdown 想真的渲染出来，必须发元素，不能发字符串。** Satori 的元素库里**没有** markdown
+   （只有 `text`/`at`/`quote`/`image`/`file`…），Markdown 是**适配器自己注册的命名空间元素**：
+   QQ 官方适配器（`@satorijs/adapter-qq/src/message.ts`）遇到 `qq:markdown` 才把 `msg_type` 设成
+   `MARKDOWN`。所以 `session.send('**加粗**')` 永远只是 `msg_type: TEXT`，源码原样上屏 ——
+   这正是 `text.markdownMode` 默认 `auto` 要解决的问题。
 
 ## 七、自测
 
