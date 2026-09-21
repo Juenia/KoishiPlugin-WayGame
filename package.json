@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-waygame",
   "description": "对接 WayGame 文字游戏核心：在群里打字就能玩 RPG（被动消息 + 主动推送 + 端口自动发现）",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

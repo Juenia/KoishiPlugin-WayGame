@@ -8,12 +8,12 @@
 
 ## 一、先下载游戏本体
 
-**下载页：<https://github.com/Juenia/KoishiPlugin-WayGame/releases>**
+| 包 | 大小 | 下载 | 什么时候需要 |
+| --- | --- | --- | --- |
+| **核心包** | 29 MB | **[Core_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260921-1842.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
+| **渲染包** | 139 MB | **[Render_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Render_._20260921-1842.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
 
-| 包 | 内容 | 什么时候需要 |
-| --- | --- | --- |
-| **核心包** | 核心 + 编辑器 + 游戏数据 + 教程文档 | **必装** |
-| **渲染包** | Electron 离屏渲染引擎 | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
+历史版本与后续更新：<https://github.com/Juenia/KoishiPlugin-WayGame/releases>
 
 1. 解压核心包到任意目录（路径别带中文和空格），双击 **启动核心.bat**（需要 Node.js 18+）
 2. 想改数据就开 **编辑器\\WayGameEditor.exe**，改完在编辑器左下角重启核心

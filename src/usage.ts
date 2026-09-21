@@ -4,7 +4,9 @@
  * 这里放的是「拿核心包 → 装渲染包 → 本插件不用配地址 → 怎么验证」这条最短路径，
  * 目标：新用户在这个页面上就能把整条链路跑通，不用去翻仓库文档。
  */
-const DOWNLOAD_PAGE = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases'
+const CORE_PACKAGE_URL = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260921-1842.zip'
+const RENDER_PACKAGE_URL = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Render_._20260921-1842.zip'
+const RELEASES_PAGE = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases'
 
 export const usage = [
   '## WayGame 文字游戏核心 · 对接插件',
@@ -12,21 +14,23 @@ export const usage = [
   '把 Koishi 机器人接到 **WayGame 文字游戏核心**：玩家在群里打字 → 核心跑完游戏逻辑 → 插件把回复发回群里。',
   '本插件不含任何游戏业务，**WayGame 那边一行代码都不用改**。',
   '',
-  '**下载页（核心包 / 渲染包 / 历史版本）**：' + DOWNLOAD_PAGE,
+  '### 一、先下载游戏本体',
   '',
-  '---',
+  '| 包 | 大小 | 下载 | 说明 |',
+  '| --- | --- | --- | --- |',
+  '| **核心包**（必装） | 29 MB | [Core_._20260921-1842.zip](' + CORE_PACKAGE_URL + ') | 核心 + 编辑器 + 游戏数据 + 教程文档 |',
+  '| **渲染包**（可选） | 139 MB | [Render_._20260921-1842.zip](' + RENDER_PACKAGE_URL + ') | Electron 离屏渲染引擎，想要图片消息才装 |',
   '',
-  '### 一、先装核心包（必须）',
+  '历史版本与后续更新：' + RELEASES_PAGE,
   '',
-  '1. 打开上面的下载页，取 **核心包**（核心 + 编辑器 + 游戏数据 + 教程文档）',
-  '2. 解压到任意目录（路径别带中文和空格），双击 **启动核心.bat**（需要 Node.js 18+）',
-  '3. 想改数据就开 **编辑器\\WayGameEditor.exe**，改完在编辑器左下角重启核心',
+  '1. 解压**核心包**到任意目录（路径别带中文和空格），双击 **启动核心.bat**（需要 Node.js 18+）',
+  '2. 想改数据就开 **编辑器\\WayGameEditor.exe**，改完在编辑器左下角重启核心',
   '',
   '> 只装核心包也能玩：文本 / Markdown 消息完全正常，图片消息会自动降级成文本，不报错。',
   '',
-  '### 二、再装渲染包（可选，想要图片消息才需要）',
+  '### 二、想要图片消息就再装渲染包',
   '',
-  '把 **渲染包** 解压到**核心包根目录**，会合并出 `node_modules\\electron`，之后 `type=image` 的房间就能出图。',
+  '把**渲染包**解压到**核心包根目录**，会合并出 `node_modules\\electron`，之后 `type=image` 的房间就能出图。',
   '',
   '> 渲染端口 = 编辑器「基础设置 → 渲染端口」（默认 3212）。同一台机器跑多个核心时，',
   '> 第二个必须改成别的端口，否则会连上第一个的渲染进程、报 unauthorized 并静默降级。',
@@ -59,5 +63,9 @@ export const usage = [
   '',
   '触发词由核心的 `custom_commands` 表决定（默认 103 条）：`注册` `角色` `地图` `背包` `攻击` …',
   '核心没认出来的消息会返回 `unknown`，插件**默认一个字都不发**，所以机器人不会在群里乱插话。',
+  '',
+  '---',
+  '',
+  '> 本插件由 AI 开发（见 [AGENTS.md](' + RELEASES_PAGE.replace('/releases', '/blob/main/AGENTS.md') + ')），质量靠可复现的测试：`npm test` 32 项端到端。',
   '',
 ].join('\n')
