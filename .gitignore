@@ -9,6 +9,12 @@ yarn-error.log
 tsconfig.tsbuildinfo
 
 .eslintcache
+
+# 凭据：绝不能进仓库（npm token / 环境变量）
+.npmrc
+.env
+.env.local
+
 .DS_Store
 .idea
 .vscode
