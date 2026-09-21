@@ -1,0 +1,51 @@
+{
+  "name": "koishi-plugin-waygame",
+  "description": "对接 WayGame 文字游戏核心：在群里打字就能玩 RPG（被动消息 + 主动推送 + 端口自动发现）",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "readme.md"
+  ],
+  "license": "MIT",
+  "author": "Juenia",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juenia/KoishiPlugin-WayGame.git"
+  },
+  "homepage": "https://github.com/Juenia/KoishiPlugin-WayGame#readme",
+  "bugs": {
+    "url": "https://github.com/Juenia/KoishiPlugin-WayGame/issues"
+  },
+  "scripts": {
+    "test": "tsx test/waygame.test.ts",
+    "probe": "tsx test/probe.ts"
+  },
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin",
+    "waygame",
+    "text-game",
+    "rpg",
+    "qq",
+    "onebot",
+    "文字游戏"
+  ],
+  "devDependencies": {
+    "@koishijs/plugin-mock": "^2.6.6",
+    "@types/node": "^22.7.5",
+    "tsx": "^4.16.2",
+    "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "koishi": "^4.18.0"
+  },
+  "koishi": {
+    "description": {
+      "zh": "把 Koishi 机器人接到 WayGame 文字游戏核心：玩家在群里打字即可游戏，支持文本 / Markdown / 图片回复与主动推送。",
+      "en": "Bridge Koishi bots to the WayGame text-game core."
+    }
+  }
+}
