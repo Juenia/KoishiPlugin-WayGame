@@ -10,7 +10,7 @@
 
 | 包 | 大小 | 下载 | 什么时候需要 |
 | --- | --- | --- | --- |
-| **核心包** | 29 MB | **[Core_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260921-1842.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
+| **核心包** | 29 MB | **[Core_._20260922-1259.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260922-1259.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
 | **渲染包** | 139 MB | **[Render_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Render_._20260921-1842.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
 
 历史版本与后续更新：<https://github.com/Juenia/KoishiPlugin-WayGame/releases>
@@ -99,7 +99,16 @@ plugins:
    `MARKDOWN`。所以 `session.send('**加粗**')` 永远只是 `msg_type: TEXT`，源码原样上屏 ——
    这正是 `text.markdownMode` 默认 `auto` 要解决的问题。
 
-## 七、自测
+## 七、更新日志
+
+| 版本 | 更新内容 |
+| --- | --- |
+| **1.0.3** | 配套核心包更新为 `Core_._20260922-1259`（插件代码本身无改动）：<br>① 战斗消息底部【战斗状态】的血量不再显示挨打前的旧值（怪物反击后状态栏血量会跟着掉）；<br>② 编辑器「玩家管理 → 属性」等子表保存不再报「保存子表失败」（Microsoft.Data.Sqlite 9 起参数必须具名，原来匿名参数必抛 `ParameterName must be set`）。 |
+| 1.0.2 | Markdown 回复改发**原生元素**（QQ 官方机器人能真渲染，不再是纯文本源码）；README 加交流群。 |
+| 1.0.1 | 配置页与 README 换成核心包 / 渲染包直链。 |
+| 1.0.0 | 首个版本：被动消息、主动推送（拉取）、端口自动发现、图片三选一、长文切分。 |
+
+## 八、自测
 
 ```sh
 git clone https://github.com/Juenia/KoishiPlugin-WayGame

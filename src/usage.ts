@@ -4,7 +4,7 @@
  * 这里放的是「拿核心包 → 装渲染包 → 本插件不用配地址 → 怎么验证」这条最短路径，
  * 目标：新用户在这个页面上就能把整条链路跑通，不用去翻仓库文档。
  */
-const CORE_PACKAGE_URL = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260921-1842.zip'
+const CORE_PACKAGE_URL = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260922-1259.zip'
 const RENDER_PACKAGE_URL = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Render_._20260921-1842.zip'
 const RELEASES_PAGE = 'https://github.com/Juenia/KoishiPlugin-WayGame/releases'
 
@@ -18,7 +18,7 @@ export const usage = [
   '',
   '| 包 | 大小 | 下载 | 说明 |',
   '| --- | --- | --- | --- |',
-  '| **核心包**（必装） | 29 MB | [Core_._20260921-1842.zip](' + CORE_PACKAGE_URL + ') | 核心 + 编辑器 + 游戏数据 + 教程文档 |',
+  '| **核心包**（必装） | 29 MB | [Core_._20260922-1259.zip](' + CORE_PACKAGE_URL + ') | 核心 + 编辑器 + 游戏数据 + 教程文档 |',
   '| **渲染包**（可选） | 139 MB | [Render_._20260921-1842.zip](' + RENDER_PACKAGE_URL + ') | Electron 离屏渲染引擎，想要图片消息才装 |',
   '',
   '历史版本与后续更新：' + RELEASES_PAGE,
