@@ -18,7 +18,8 @@
 
 ```sh
 npm i
-npm test                              # 32 项端到端，不需要装游戏本体
+npm test                              # 41 项端到端，不需要装游戏本体
+npm run build                         # 出 lib/（发布才需要；开发/测试不需要）
 npx tsx test/probe.ts "注册 张三 男"   # 手动看一眼「这句话会发出什么」
 ```
 
@@ -34,7 +35,9 @@ Session（群聊 / 私聊都有），所以整条链路是真跑的，只是核�
 | `src/dispatch.ts` | text / markdown / image 分发、长文切分、图片三选一与兜底 |
 | `src/push.ts` | 主动推送（拉取模式：pull → 发送 → ack） |
 | `src/config.ts` | 配置项（控制台里带中文说明） |
-| `src/usage.ts` | 配置页顶部展示的 Markdown（核心包/渲染包下载地址与用法） |
+| `src/usage.ts` | 配置页顶部展示的 Markdown（置顶「更新核心包」+ 热更版本，启动时从热更源拉一次） |
+| `scripts/build.mjs` | 构建 `lib/`（esbuild 打包 + tsc 出声明 + 产物自检），`npm run build` |
+| `构建与发布.md` | **构建/发布怎么做 + 全部踩坑记录**，发版前必读 |
 | `test/` | 假核心 + 端到端测试 + 手动烟雾脚本 |
 
 ## 铁律（改之前先读，违反即视为 bug）
@@ -69,15 +72,21 @@ Session（群聊 / 私聊都有），所以整条链路是真跑的，只是核�
 
 ## 发布
 
+**先读 [构建与发布.md](./构建与发布.md)** —— 完整步骤、发出去怎么验、以及 9 条踩坑记录（其中
+「`tsconfig.tsbuildinfo` 让 tsc 静默不出 `.d.ts`」和「忘了 `--charset=utf8` 中文被转义」
+都是**不报错但发出去才发现**的类型）。最短路径：
+
 ```sh
-# 构建在 Koishi 应用根目录做（本仓库是被 workspace 链接进去的）
-cd ..\.. && npm run build
-cd external/waygame && npm pack --dry-run
+npm version <新版本> --no-git-tag-version
+npm run build                       # 必须！lib/ 不在仓库里，不 build 包是空的
+npm test                            # 必须！全绿才发
+npm pack --dry-run                  # 应为 10 个文件
+git add -A && git commit -m "chore: 版本号 <新版本>" && git push
 npm publish --registry=https://registry.npmjs.org --access public
 ```
 
 `lib/` 是构建产物、已在 `.gitignore` 里，但**必须存在于 npm 包里**（`files: ["lib", "readme.md"]`）。
-发布前记得先 build，否则包是空的。
+发布后等 1~4 分钟注册表才落地（`npm publish` 返回 202 是正常的），别急着重发。
 
 ## 提交信息
 

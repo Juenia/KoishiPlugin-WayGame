@@ -19,6 +19,7 @@
     "url": "https://github.com/Juenia/KoishiPlugin-WayGame/issues"
   },
   "scripts": {
+    "build": "node scripts/build.mjs",
     "test": "tsx test/waygame.test.ts",
     "probe": "tsx test/probe.ts"
   },
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@koishijs/plugin-mock": "^2.6.6",
     "@types/node": "^22.7.5",
+    "esbuild": "^0.28.2",
     "tsx": "^4.16.2",
     "typescript": "^5.6.2"
   },
