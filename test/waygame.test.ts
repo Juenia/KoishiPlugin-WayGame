@@ -4,7 +4,9 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { createServer } from 'node:http'
 import * as waygame from '../src/index'
+import { refreshHotfix } from '../src/usage'
 import { discoverEndpoint } from '../src/core-client'
 import { deliverResponse, markdownElementFor } from '../src/dispatch'
 import { MockCore } from './mock-core'
@@ -18,6 +20,10 @@ import { MockCore } from './mock-core'
  *
  * 运行：npm test（= tsx test/waygame.test.ts）
  */
+
+// 测试里不许自动去拉热更清单：每个用例都会 apply 一次插件，真打 GitHub 会拖慢又看天吃饭。
+// 拉取本身由下面「配置页顶部」那几个用例用本地假清单服务器**显式**覆盖。
+process.env.WAYGAME_SKIP_HOTFIX = '1'
 
 const GROUP = '100000'
 const USER = '10001'
@@ -539,6 +545,54 @@ async function main(): Promise<void> {
     assert.equal(ack?.ok, false)
     assert.notEqual(ack?.retry, true, '默认不该带 retry，否则核心会重发导致刷屏')
     bot.sendMessage = original
+  })
+
+  // ---------------------------------------------------------------- 配置页顶部「更新核心包」
+  section('配置页顶部：更新核心包 / 热更版本')
+
+  await test('顶部区块存在，且下载直链是当前资产名（不是改名前的旧名）', async () => {
+    const text = waygame.usage
+    assert.ok(text.includes('更新核心包'), '配置页顶部应有「更新核心包」区块，实际开头：' + text.slice(0, 120))
+    assert.ok(text.indexOf('更新核心包') < text.indexOf('WayGame 文字游戏核心'), '这个区块必须在最上面')
+    assert.ok(text.includes('WayGameCore.zip'), '应有核心包直链')
+    assert.ok(text.includes('WayGameRender.zip'), '应有渲染包直链')
+    assert.ok(!text.includes('Core_._20260921-1842.zip'), '不能用改名前的旧资产名（链接是死的）')
+    assert.ok(text.includes('update.exe'), '要告诉已有核心的人用 update.exe 一键更新，而不是重下整包')
+    // 从没取到过版本时的兜底文案（下面两个用例会真的去拉，所以这条分支只能在这里断言）
+    assert.ok(text.includes('尚未检查'), '没检查过要如实说，不能编一个版本号出来，实际：' + text.slice(0, 200))
+  })
+
+  await test('拉热更清单成功后，版本号和更新说明出现在配置页顶部', async () => {
+    const server = createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' })
+      res.end(JSON.stringify({
+        schema: 2,
+        coreVersion: '9.9.9-test',
+        releasedAt: '2026-09-23T00:00:00.000Z',
+        notes: ['测试用更新说明'],
+      }))
+    })
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+    const port = (server.address() as any).port
+    try {
+      const info = await refreshHotfix({ url: 'http://127.0.0.1:' + port + '/hotfix/manifest.json', timeoutMs: 5000 })
+      assert.equal(info?.version, '9.9.9-test')
+      // `usage` 是从 index 转出去的活绑定 —— 刷新后必须跟着变
+      assert.ok(waygame.usage.includes('9.9.9-test'), '刷新后配置页顶部应显示新版本，实际：' + waygame.usage.slice(0, 200))
+      assert.ok(waygame.usage.includes('测试用更新说明'), '更新说明也要显示出来')
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+    }
+  })
+
+  await test('清单拉不到时不抛异常，且不擦掉上次成功取到的版本', async () => {
+    const info = await refreshHotfix({ url: 'http://127.0.0.1:1/hotfix/manifest.json', timeoutMs: 1500 })
+    assert.equal(info, null, '失败应返回 null 而不是抛异常')
+    assert.ok(waygame.usage.includes('更新核心包'), '拉取失败也要保留区块')
+    assert.ok(waygame.usage.includes('WayGameCore.zip'), '拉取失败也要保留下载直链')
+    // 特意不清空：最后一次成功取到的版本照样有用，旁边那行时间戳会告诉用户它有多旧。
+    // 一断网就把版本号擦成「取不到」，反而是把已知信息扔了。
+    assert.ok(waygame.usage.includes('9.9.9-test'), '不该把上次取到的版本擦掉，实际：' + waygame.usage.slice(0, 200))
   })
 
   // ---------------------------------------------------------------- 收尾

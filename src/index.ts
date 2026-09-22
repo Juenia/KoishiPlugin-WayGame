@@ -3,10 +3,19 @@ import { Config } from './config'
 import { CoreOfflineError, WayGameClient, type BeeMessageRequest, type BeeMessageResponse } from './core-client'
 import { deliverResponse, describeError, markdownElementFor, type Sendable, type Sender } from './dispatch'
 import { startPushLoop } from './push'
+import { HOTFIX_REFRESH_INTERVAL, refreshHotfix } from './usage'
 
 export { Config } from './config'
 export { usage } from './usage'
 export const name = 'waygame'
+
+/**
+ * 自动拉热更版本可以关掉：设环境变量 `WAYGAME_SKIP_HOTFIX=1`。
+ * 测试里必须关（否则每造一个 app 就往 GitHub 打一次），生产环境默认开着。
+ */
+function hotfixAutoCheckEnabled(): boolean {
+  return String(process.env.WAYGAME_SKIP_HOTFIX || '') !== '1'
+}
 
 
 export function apply(ctx: Context, config: Config): void {
@@ -21,6 +30,14 @@ export function apply(ctx: Context, config: Config): void {
   })
 
   startPushLoop(ctx, client, config)
+
+  // 配置页顶部「更新核心包」要显示当前热更版本：启动拉一次，之后每 6 小时刷一次。
+  // 纯展示用途 —— refreshHotfix 自己吞掉所有异常，网络不通只是让那一块显示「暂时取不到」，
+  // 绝不影响消息链路，也绝不让配置页打不开。
+  if (hotfixAutoCheckEnabled()) {
+    void refreshHotfix()
+    ctx.setInterval(() => { void refreshHotfix() }, HOTFIX_REFRESH_INTERVAL)
+  }
 
   ctx.command('waygame.status', '查看 WayGame 对接状态（核心地址 / 在线情况 / 推送队列）', { authority: 3 })
     .action(() => statusReport(client, config))

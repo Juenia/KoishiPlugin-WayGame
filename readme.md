@@ -10,14 +10,19 @@
 
 | 包 | 大小 | 下载 | 什么时候需要 |
 | --- | --- | --- | --- |
-| **核心包** | 29 MB | **[Core_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameCore.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
-| **渲染包** | 139 MB | **[Render_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameRender.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
+| **核心包** | 29 MB | **[WayGameCore.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameCore.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
+| **渲染包** | 139 MB | **[WayGameRender.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameRender.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
 
 历史版本与后续更新：<https://github.com/Juenia/KoishiPlugin-WayGame/releases>
+
+> **装了之后不用记版本号** —— 插件配置页**最上面**就写着当前热更新版本，实时取自
+> <https://github.com/Juenia/WayGameCore> 的 `hotfix/manifest.json`。
 
 1. 解压核心包到任意目录（路径别带中文和空格），双击 **启动核心.bat**（需要 Node.js 18+）
 2. 想改数据就开 **编辑器\\WayGameEditor.exe**，改完在编辑器左下角重启核心
 3. 想要图片消息：把渲染包解压到**核心包根目录**，会合并出 `node_modules\\electron`
+4. 想让核心保持最新：双击核心目录里的 **update.exe**，它自己拉最新版并覆盖（**不用重下整包**）；
+   更坏了就打 `update.exe rollback` 退回上一版（只留最近两版备份）
 
 > 只装核心包也能玩：文本 / Markdown 消息完全正常，图片消息会自动降级成文本，不报错。
 > 渲染端口 = 编辑器「基础设置 → 渲染端口」（默认 3212）；同机跑多个核心时第二个必须换端口，
