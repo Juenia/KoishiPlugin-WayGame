@@ -10,8 +10,8 @@
 
 | 包 | 大小 | 下载 | 什么时候需要 |
 | --- | --- | --- | --- |
-| **核心包** | 29 MB | **[Core_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Core_._20260921-1842.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
-| **渲染包** | 139 MB | **[Render_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/Render_._20260921-1842.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
+| **核心包** | 29 MB | **[Core_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameCore.zip)** | **必装**（核心 + 编辑器 + 游戏数据 + 教程文档） |
+| **渲染包** | 139 MB | **[Render_._20260921-1842.zip](https://github.com/Juenia/KoishiPlugin-WayGame/releases/download/WayGameCore/WayGameRender.zip)** | 想要图片消息（角色卡 / 地图 / 背包出图）才装 |
 
 历史版本与后续更新：<https://github.com/Juenia/KoishiPlugin-WayGame/releases>
 
